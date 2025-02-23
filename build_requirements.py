@@ -113,26 +113,36 @@ def get_library_versions(imports: set):
 
 def create_requirements_file(library_versions: dict,
                              output_path: str = 'requirements.txt'):
-    '''
-
+    """
+    Creates a requirements.txt file with the specified library versions.
+    If the file already exists, it checks for mismatches before overwriting.
 
     Parameters
     ----------
     library_versions : dict
-        DESCRIPTION.
+        A dictionary of library names as keys and their versions as values.
     output_path : str, optional
-        DESCRIPTION. The default is 'requirements.txt'.
+        The file path where the requirements file should be created. Default is 'requirements.txt'.
 
     Returns
     -------
     None.
+    """
+    new_content = "\n".join(f"{lib}=={version}" for lib,
+                            version in library_versions.items())
 
-    '''
+    if os.path.exists(output_path):
+        with open(output_path, 'r') as req_file:
+            existing_content = req_file.read().strip()
+
+        if existing_content == new_content:
+            print(
+                f"No changes detected in {output_path}. File remains unchanged.")
+            return
 
     with open(output_path, 'w') as req_file:
-        for lib, version in library_versions.items():
-            req_file.write(f"{lib}=={version}\n")
-    print(f"requirements.txt created at {output_path}")
+        req_file.write(new_content + "\n")
+    print(f"requirements.txt created/updated at {output_path}")
 
 
 def main():
